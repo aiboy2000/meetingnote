@@ -132,29 +132,29 @@ echo 📦 必要パッケージをインストール中...
 python -m pip install --upgrade pip --quiet
 
 :: 基本パッケージ
-echo インストール中: Gradio...
+echo Installing: Gradio...
 python -m pip install gradio==4.44.0 --quiet
 if %errorLevel% equ 0 (
-    echo ✅ Gradio インストール完了
+    echo OK: Gradio install completed
 ) else (
-    echo ❌ Gradio インストールに失敗
+    echo ERROR: Gradio install failed
 )
 
 :: オプションパッケージ
 echo.
-set /p INSTALL_EXTRA="追加パッケージ（PDF処理など）もインストールしますか？ (y/n): "
+set /p INSTALL_EXTRA="Install additional packages (PDF processing etc.)? (y/n): "
 if /i "%INSTALL_EXTRA%"=="y" (
-    echo 追加パッケージをインストール中...
+    echo Installing additional packages...
     python -m pip install pdfplumber pandas requests --quiet
-    echo ✅ 追加パッケージ完了
+    echo OK: Additional packages completed
 )
 
 :: インストール確認
 echo.
-echo 🧪 インストール確認中...
-python -c "import gradio; print('✅ Gradio動作確認OK')" 2>nul
+echo Testing installation...
+python -c "import gradio; print('OK: Gradio test successful')" 2>nul
 if %errorLevel% neq 0 (
-    echo ❌ Gradio動作確認に失敗
+    echo ERROR: Gradio test failed
 )
 
 :: 起動スクリプト作成
