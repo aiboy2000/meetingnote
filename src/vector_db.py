@@ -15,29 +15,73 @@ import logging
 logger = logging.getLogger(__name__)
 
 class VectorDB:
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "auto"):
         """
         ベクターデータベースを初期化
         
         Args:
-            model_name: SentenceTransformerのモデル名
+            model_name: SentenceTransformerのモデル名 ("auto"で自動選択)
         """
-        # 日本語モデルが利用できない場合は英語モデルを使用
-        try:
-            if "ja" in model_name or "japanese" in model_name.lower():
-                # 日本語モデルを試行
-                try:
-                    self.model = SentenceTransformer(model_name)
-                except Exception as e:
-                    logger.warning(f"Japanese model failed, falling back to multilingual: {e}")
-                    # 多言語対応モデルにフォールバック
-                    self.model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
-            else:
-                self.model = SentenceTransformer(model_name)
-        except Exception as e:
-            logger.warning(f"Model {model_name} failed, using default: {e}")
-            # デフォルトの軽量モデルを使用
-            self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.model = self._load_best_model(model_name)
+    
+    def _load_best_model(self, model_name: str):
+        """利用可能な最適なモデルを読み込み"""
+        
+        # 日本語対応モデルの優先順位
+        japanese_models = [
+            "sonoisa/sentence-bert-base-ja-mean-tokens-v2",  # 日本語専用（最適）
+            "cl-tohoku/bert-base-japanese-v2",               # 日本語BERT
+        ]
+        
+        # 多言語モデル（日本語もサポート）
+        multilingual_models = [
+            "paraphrase-multilingual-MiniLM-L12-v2",        # 多言語（推奨）
+            "distiluse-base-multilingual-cased",            # 軽量多言語
+        ]
+        
+        # 英語モデル（フォールバック）
+        english_models = [
+            "all-MiniLM-L6-v2",                             # 軽量英語
+            "all-mpnet-base-v2",                            # 高性能英語
+        ]
+        
+        if model_name != "auto":
+            # 指定されたモデルを試行
+            try:
+                logger.info(f"Loading specified model: {model_name}")
+                return SentenceTransformer(model_name)
+            except Exception as e:
+                logger.warning(f"Specified model {model_name} failed: {e}")
+        
+        # 自動選択モード
+        logger.info("Auto-selecting best available model for Japanese...")
+        
+        # 1. 日本語専用モデルを試行
+        for model in japanese_models:
+            try:
+                logger.info(f"Trying Japanese model: {model}")
+                return SentenceTransformer(model)
+            except Exception as e:
+                logger.warning(f"Japanese model {model} failed: {e}")
+        
+        # 2. 多言語モデルを試行
+        for model in multilingual_models:
+            try:
+                logger.info(f"Trying multilingual model: {model}")
+                return SentenceTransformer(model)
+            except Exception as e:
+                logger.warning(f"Multilingual model {model} failed: {e}")
+        
+        # 3. 英語モデルをフォールバック
+        for model in english_models:
+            try:
+                logger.info(f"Falling back to English model: {model}")
+                return SentenceTransformer(model)
+            except Exception as e:
+                logger.warning(f"English model {model} failed: {e}")
+        
+        # 最後の手段
+        raise RuntimeError("No suitable model could be loaded")
         self.index = None
         self.terms = []
         self.term_metadata = {}

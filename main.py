@@ -26,9 +26,9 @@ class MeetingTranscriberApp:
         """アプリケーションを初期化"""
         self.term_extractor = TermExtractor()
         
-        # ベクターDBを安全に初期化
+        # ベクターDBを安全に初期化（日本語優先で自動選択）
         try:
-            self.vector_db = VectorDB("all-MiniLM-L6-v2")  # 軽量な英語モデルを使用
+            self.vector_db = VectorDB("auto")  # 日本語対応モデルを自動選択
         except Exception as e:
             logger.error(f"VectorDB initialization failed: {e}")
             self.vector_db = None
