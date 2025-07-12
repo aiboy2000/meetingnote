@@ -241,7 +241,18 @@ class MeetingTranscriberApp:
     def create_interface(self):
         """Gradioインターフェースを作成"""
         
-        with gr.Blocks(title="建築業務会議転写システム") as app:
+        # Gradio設定
+        theme = gr.themes.Soft()
+        
+        with gr.Blocks(
+            title="建築業務会議転写システム",
+            theme=theme,
+            css="""
+            .gradio-container {
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+            }
+            """
+        ) as app:
             gr.Markdown("# 建築業務会議転写システム")
             gr.Markdown("専門術語データベースを使用した高精度な会議転写と議事録生成")
             
@@ -383,20 +394,24 @@ def main():
     
     # 既存のデータベースがあれば自動読み込み
     try:
-        app_instance.load_existing_database()
-        logger.info("Existing database loaded automatically")
-    except:
-        logger.info("No existing database found")
+        if app_instance.vector_db:
+            app_instance.load_existing_database()
+            logger.info("Existing database loaded automatically")
+    except Exception as e:
+        logger.info(f"No existing database found: {e}")
     
     # Gradioインターフェースを起動
     interface = app_instance.create_interface()
     
     # アプリケーションを起動
     interface.launch(
-        server_name="0.0.0.0",  # 外部からアクセス可能
+        server_name="127.0.0.1",  # ローカルホストのみ
         server_port=7860,
         share=False,  # パブリック共有は無効
-        debug=True
+        debug=False,  # デバッグを無効にして安定性向上
+        show_error=True,  # エラー表示を有効
+        quiet=False,  # ログ出力を有効
+        inbrowser=True  # 自動でブラウザを開く
     )
 
 if __name__ == "__main__":
