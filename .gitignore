@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models and Data
+models/
+*.pth
+*.bin
+*.safetensors
+*.pkl
+*.npy
+*.npz
+
+# Audio/Video Files
+*.mp4
+*.avi
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.flac
+
+# PDF Documents
+*.pdf
+
+# Excel Files
+*.xlsx
+*.xls
+
+# ZIP Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Meeting Materials
+input-*/
+会议*/
+专业术语/
+meetingdata/
+testdata/
+
+# Logs
+*.log
+logs/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Vector Database
+vector_db/
+faiss_index/
+*.faiss
+*.index
+
+# Cache
+.cache/
+cache/
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
