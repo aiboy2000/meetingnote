@@ -15,14 +15,29 @@ import logging
 logger = logging.getLogger(__name__)
 
 class VectorDB:
-    def __init__(self, model_name: str = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         """
         ベクターデータベースを初期化
         
         Args:
             model_name: SentenceTransformerのモデル名
         """
-        self.model = SentenceTransformer(model_name)
+        # 日本語モデルが利用できない場合は英語モデルを使用
+        try:
+            if "ja" in model_name or "japanese" in model_name.lower():
+                # 日本語モデルを試行
+                try:
+                    self.model = SentenceTransformer(model_name)
+                except Exception as e:
+                    logger.warning(f"Japanese model failed, falling back to multilingual: {e}")
+                    # 多言語対応モデルにフォールバック
+                    self.model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+            else:
+                self.model = SentenceTransformer(model_name)
+        except Exception as e:
+            logger.warning(f"Model {model_name} failed, using default: {e}")
+            # デフォルトの軽量モデルを使用
+            self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.index = None
         self.terms = []
         self.term_metadata = {}

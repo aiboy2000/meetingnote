@@ -25,7 +25,14 @@ class MeetingTranscriberApp:
     def __init__(self):
         """アプリケーションを初期化"""
         self.term_extractor = TermExtractor()
-        self.vector_db = VectorDB()
+        
+        # ベクターDBを安全に初期化
+        try:
+            self.vector_db = VectorDB("all-MiniLM-L6-v2")  # 軽量な英語モデルを使用
+        except Exception as e:
+            logger.error(f"VectorDB initialization failed: {e}")
+            self.vector_db = None
+            
         self.transcriber = None
         self.minutes_generator = MinutesGenerator()
         self.tagger = SmartTagger()
@@ -74,7 +81,7 @@ class MeetingTranscriberApp:
             logger.info(f"Extracted {len(all_terms)} unique terms")
             
             # ベクターデータベースを構築
-            if all_terms:
+            if all_terms and self.vector_db:
                 logger.info("Building vector database...")
                 self.vector_db.build_index(list(all_terms))
                 
@@ -98,6 +105,9 @@ class MeetingTranscriberApp:
     def load_existing_database(self) -> str:
         """既存の専門術語データベースを読み込み"""
         try:
+            if not self.vector_db:
+                return "ベクターデータベースが初期化されていません。"
+                
             index_dir = self.data_dir / "vector_index"
             if index_dir.exists():
                 self.vector_db.load_index(str(index_dir))
@@ -204,6 +214,9 @@ class MeetingTranscriberApp:
             検索結果
         """
         try:
+            if not self.vector_db:
+                return "ベクターデータベースが初期化されていません。"
+                
             if not self.term_db_loaded:
                 return "専門術語データベースが読み込まれていません。"
             
