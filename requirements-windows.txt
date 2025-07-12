@@ -5,13 +5,11 @@ transformers
 sentence-transformers
 faiss-cpu
 pdfplumber
-mecab-python3
 gradio
 numpy
 pandas
 scikit-learn
 requests
 Pillow
-ffmpeg-python
 soundfile
 librosa
